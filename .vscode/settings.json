@@ -1,0 +1,12 @@
+{
+    "cSpell.ignoreWords": [
+        "auth",
+        "facades",
+        "jwt",
+        "laravel",
+        "mailhog",
+        "recent",
+        "todos",
+        "tymon"
+    ]
+}
