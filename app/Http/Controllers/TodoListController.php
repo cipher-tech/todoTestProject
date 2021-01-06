@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\TodoList;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class TodoListController extends Controller
 {
@@ -78,7 +79,7 @@ class TodoListController extends Controller
         ]);
 
         if ($validator->fails()) {
-            $response = ['status' => false, 'data' => ['invalid input', $validator->errors()]];
+            $response = ['status' => false, 'data' => ["message" => 'invalid input', "payload" => $validator->errors()]];
 
             return response()->json($response, 403);
         }
@@ -98,9 +99,9 @@ class TodoListController extends Controller
 
         if ( $todoList->save()) {
             $recentTodos = TodoList::orderBy('created_at', 'desc')->take(10)->get();
-            return response()->json($this->generateResponse("success",["Task updated", $recentTodos ]), 200);
+            return response()->json($this->generateResponse("success",["message" => "Task updated","payload" =>  $recentTodos ]), 200);
         } else {
-            return response()->json($this->generateResponse("failed","could not update task"), 402);
+            return response()->json($this->generateResponse("failed",["message" => "could not update task"]), 402);
         }
     }
 
@@ -111,9 +112,42 @@ class TodoListController extends Controller
         ]);
         if (TodoList::whereId($request->id)->delete()) {
             $TodoList = TodoList::orderBy('created_at', 'desc')->take(10)->get();
-            return response()->json($this->generateResponse("success", ["Deleted task", $TodoList]), 200);
+            return response()->json($this->generateResponse("success", ["message" => "Deleted task", "payload" => $TodoList]), 200);
         } else {
-            return response()->json($this->generateResponse("failed", "could not delete task"), 402);
+            return response()->json($this->generateResponse("failed",["message" =>  "could not delete task"]), 402);
+        }
+    }
+    public function startTask(Request $request, TodoList $todoList)
+    {
+        $todoList->status = $this->todoStatus[1];
+        $todoList->started_at = Carbon::now();
+
+        if ($todoList->save()) {
+            return response()->json($this->generateResponse("success", ["message" => "Task Started", "payload" => $todoList]), 200);
+        } else {
+            return response()->json($this->generateResponse("failed",["message" =>  "could not start task"]), 402);
+        }
+    }
+    public function completedTask(Request $request, TodoList $todoList)
+    {
+        $todoList->status = $this->todoStatus[0];
+        $todoList->completed_at = Carbon::now();
+
+        if ($todoList->save()) {
+            return response()->json($this->generateResponse("success", ["message" => "Task Started", "payload" => $todoList]), 200);
+        } else {
+            return response()->json($this->generateResponse("failed",["message" =>  "could not start task"]), 402);
+        }
+    }
+    public function getUser(Request $request, TodoList $todoList)
+    {
+        $todoList->status = $this->todoStatus[0];
+        $todoList->completed_at = Carbon::now();
+
+        if ($todoList->save()) {
+            return response()->json($this->generateResponse("success", ["message" => "Task Started", "payload" => $todoList]), 200);
+        } else {
+            return response()->json($this->generateResponse("failed",["message" =>  "could not start task"]), 402);
         }
     }
 }

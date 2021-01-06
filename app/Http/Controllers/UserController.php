@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
+    private function generateResponse($status, $data)
+    {
+        return  ["status" => $status, "data" => $data];
+    } 
     private function getToken($email, $password)
     {
         $token = null;
@@ -103,9 +107,10 @@ class UserController extends Controller
         return response()->json($response, 200);
     }
 
-    public function getUser()
+    public function getUser(Request $request, User $user)
     {
         # code...
-        return "ok";
+        return response()->json($this->generateResponse("success", ["message" => "Successfully fetched user", "payload" => $user]), 200);
+        
     }
 }

@@ -26,12 +26,13 @@ Route::get('test', function(){
 });
 
 Route::group(['middleware' => 'jwt-auth'], function () {
+    Route::get('logout', 'App\Http\Controllers\UserController@logout');
 
     Route::get('todo-list', 'App\Http\Controllers\TodoListController@index');
     Route::post('todo-list', 'App\Http\Controllers\TodoListController@create');
     Route::put('todo-list', 'App\Http\Controllers\TodoListController@update');
     Route::delete('todo-list/{todoList}',  function($todoList) {
-    
+        
         if ($todoList->delete()) {
             $todoList = App\Models\TodoList::orderBy('created_at', 'desc')->take(10)->get();
             return response()->json(generateResponse("success", ["Deleted task", $todoList]), 200);
@@ -39,12 +40,11 @@ Route::group(['middleware' => 'jwt-auth'], function () {
             return response()->json(generateResponse("failed", "could not delete task"), 402);
         }
     });
+    Route::get('todo-list/start/{todoList}', 'App\Http\Controllers\TodoListController@startTask');
+    Route::get('todo-list/completed/{todoList}', 'App\Http\Controllers\TodoListController@completedTask');
 
-    Route::get('logout', 'App\Http\Controllers\UserController@logout');
     
-    Route::get('user-info/{user}', function($user) {
-        return response()->json($user, 200);
-    });
+    Route::get('user-info/{user}', 'App\Http\Controllers\UserController@getUser');
 });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
