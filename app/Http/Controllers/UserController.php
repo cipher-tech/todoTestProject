@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use JWTAuth;
 use JWTAuthException;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -111,6 +112,53 @@ class UserController extends Controller
     {
         # code...
         return response()->json($this->generateResponse("success", ["message" => "Successfully fetched user", "payload" => $user]), 200);
+        
+    }
+    public function getUserStats(Request $request, User $user)
+    {
+        # code...
+        $totalTasks = $user->TodoList()->count();
+        $totalLabels = $user->TodoList->filter(function ($todoList) {
+            return $todoList->label !== '0';
+           })
+           ->count();
+
+        //    $timeStats = [];
+           $timeStats = $user->TodoList->filter(function ($todoList) {
+            return $todoList->status === 'completed';
+           })->each(function ($todoList) {
+            // global $timeStats;
+            // $timeStats = [];
+            $started_at = new Carbon($todoList->started_at, "West Central Africa");
+            $completed_at = new Carbon($todoList->completed_at, "West Central Africa");
+            
+            $totalDays = $started_at->diffInDays($completed_at);
+            $totalHours = $started_at->diffInHours($completed_at);
+            $totalMinute = $started_at->diffInMinutes($completed_at);
+            $totalSeconds = $started_at->diffInSeconds($completed_at);
+            
+            $stats = [
+                "id" => $todoList->id,
+                "title" => $todoList->title,
+                "started_at" => $todoList->started_at,
+                "completed_at" => $todoList->completed_at,
+                "totalDays" => $totalDays,
+                "totalHours" => $totalHours,
+                "totalMinute" => $totalMinute,
+                "totalSeconds" => $totalSeconds,
+            ];
+            $todoList->timeStats = $stats;
+       
+           })->pluck("timeStats");
+
+        return response()->json($this->generateResponse("success", [
+            "message" => "Successfully fetched user", 
+            "payload" => [
+                "totalTasks" => $totalTasks,
+                "totalLabels" => $totalLabels,
+                "timeStats" => $timeStats
+            ]
+            ]), 200);
         
     }
 }
