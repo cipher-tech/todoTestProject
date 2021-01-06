@@ -17,12 +17,21 @@ class TodoListController extends Controller
         return  ["status" => $status, "data" => $data];
     }
 
+    public function index(Request $request)
+    {
+        # code...
+        $validator = Validator::make($request->all(), [
+            'per_page' => 'required|min:1|max:10',
+        ]);
+        
+            return TodoList::paginate($request->per_page);
+    }
     public function create(Request $request)
     {
         # code...
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|min:1|max:10',
-            'title' => 'required|max:125|email',
+            'title' => 'required|max:125',
             'description' => 'required|max:40',
             'label' => 'min:3|max:40',
             'priority' => 'min:4|max:40',
@@ -56,12 +65,12 @@ class TodoListController extends Controller
          }
     }
 
-    public function Update()
+    public function Update(Request $request)
     {
         # code...
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required|min:1|max:10',
-            'title' => 'required|max:125|email',
+            'id' => 'required|min:1|max:10',
+            'title' => 'required|max:125',
             'description' => 'required|max:40',
             'label' => 'min:3|max:40',
             'priority' => 'min:4|max:40',
@@ -74,23 +83,37 @@ class TodoListController extends Controller
             return response()->json($response, 403);
         }
 
-        $todoList = new TodoList([
-            'title' => $request->title,
-            'description' => $request->description,
-            'slug' => \Str::slug($request->title),
-            'priority' => $request->priority || $this->priority[0] ,
-            'status' => $this->todoStatus[2],
-            'label' => $request->label || null,
-            'estimated_start_date' => $request->estimated_start_date? $request->estimated_start_date :  null,
-            'estimated_end_date' =>  $request->estimated_end_date? $request->estimated_end_date :  null,
-            'reminder' => $request->reminder || false,
-        ]);
+        $todoList = TodoList::whereId($request->id)->firstOrFail();
+
+            $todoList->title = $request->title;
+            $todoList->description = $request->description;
+            $todoList->slug = \Str::slug($request->title);
+            $todoList->priority = $request->priority ? $request->priority : $todoList->priority;
+            $todoList->status = $request->status ? $request->status : $todoList->status;
+            $todoList->label = $request->label ? $request->label : $todoList->label;
+            $todoList->estimated_start_date = $request->estimated_start_date? $request->estimated_start_date : $todoList->estimated_start_date;
+            $todoList->estimated_end_date =  $request->estimated_end_date? $request->estimated_end_date : $todoList->estimated_end_date;
+            $todoList->reminder = $request->reminder ? $request->reminder :  $todoList->reminder;
+            $todoList->comment = $request->comment ? $request->comment :  $todoList->comment;
 
         if ( $todoList->save()) {
             $recentTodos = TodoList::orderBy('created_at', 'desc')->take(10)->get();
-            return response()->json($this->generateResponse("success",["Task created", $recentTodos ]), 200);
+            return response()->json($this->generateResponse("success",["Task updated", $recentTodos ]), 200);
         } else {
-            return response()->json($this->generateResponse("failed","could not create task"), 402);
+            return response()->json($this->generateResponse("failed","could not update task"), 402);
+        }
+    }
+
+    public function destroy(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|min:1|max:10',
+        ]);
+        if (TodoList::whereId($request->id)->delete()) {
+            $TodoList = TodoList::orderBy('created_at', 'desc')->take(10)->get();
+            return response()->json($this->generateResponse("success", ["Deleted task", $TodoList]), 200);
+        } else {
+            return response()->json($this->generateResponse("failed", "could not delete task"), 402);
         }
     }
 }

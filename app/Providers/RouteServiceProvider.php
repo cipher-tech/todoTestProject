@@ -37,6 +37,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         parent::boot();
         Route::model('user', "App\Models\User");
+        Route::model('todoList', "App\Models\TodoList");
 
         $this->configureRateLimiting();
 

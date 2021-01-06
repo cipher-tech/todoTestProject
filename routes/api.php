@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+function generateResponse($status, $data)
+{
+    return  ["status" => $status, "data" => $data];
+}
+
 Route::post('login', 'App\Http\Controllers\UserController@login');
 Route::post('register', 'App\Http\Controllers\UserController@register');
 
@@ -22,10 +27,21 @@ Route::get('test', function(){
 
 Route::group(['middleware' => 'jwt-auth'], function () {
 
+    Route::get('todo-list', 'App\Http\Controllers\TodoListController@index');
     Route::post('todo-list', 'App\Http\Controllers\TodoListController@create');
     Route::put('todo-list', 'App\Http\Controllers\TodoListController@update');
+    Route::delete('todo-list/{todoList}',  function($todoList) {
+    
+        if ($todoList->delete()) {
+            $todoList = App\Models\TodoList::orderBy('created_at', 'desc')->take(10)->get();
+            return response()->json(generateResponse("success", ["Deleted task", $todoList]), 200);
+        } else {
+            return response()->json(generateResponse("failed", "could not delete task"), 402);
+        }
+    });
 
     Route::get('logout', 'App\Http\Controllers\UserController@logout');
+    
     Route::get('user-info/{user}', function($user) {
         return response()->json($user, 200);
     });
