@@ -66,11 +66,11 @@ class TodoListController extends Controller
          }
     }
 
-    public function Update(Request $request)
+    public function Update(Request $request, TodoList $todoList)
     {
         # code...
         $validator = Validator::make($request->all(), [
-            'id' => 'required|min:1|max:10',
+            // 'id' => 'required|min:1|max:10',
             'title' => 'required|max:125',
             'description' => 'required|max:40',
             'label' => 'min:3|max:40',
@@ -84,7 +84,7 @@ class TodoListController extends Controller
             return response()->json($response, 403);
         }
 
-        $todoList = TodoList::whereId($request->id)->firstOrFail();
+        // $todoList = TodoList::whereId($request->id)->firstOrFail();
 
             $todoList->title = $request->title;
             $todoList->description = $request->description;
@@ -98,23 +98,20 @@ class TodoListController extends Controller
             $todoList->comment = $request->comment ? $request->comment :  $todoList->comment;
 
         if ( $todoList->save()) {
-            $recentTodos = TodoList::orderBy('created_at', 'desc')->take(10)->get();
-            return response()->json($this->generateResponse("success",["message" => "Task updated","payload" =>  $recentTodos ]), 200);
+            // $recentTodos = TodoList::orderBy('created_at', 'desc')->take(10)->get();
+            return response()->json($this->generateResponse("success",["message" => "Task updated","payload" =>  $todoList ]), 200);
         } else {
             return response()->json($this->generateResponse("failed",["message" => "could not update task"]), 402);
         }
     }
 
-    public function destroy(Request $request)
+    public function destroy(Request $request, TodoList $todoList)
     {
-        $validator = Validator::make($request->all(), [
-            'id' => 'required|min:1|max:10',
-        ]);
-        if (TodoList::whereId($request->id)->delete()) {
-            $TodoList = TodoList::orderBy('created_at', 'desc')->take(10)->get();
-            return response()->json($this->generateResponse("success", ["message" => "Deleted task", "payload" => $TodoList]), 200);
+        if ($todoList->delete()) {
+            $todoList = App\Models\TodoList::orderBy('created_at', 'desc')->take(10)->get();
+            return response()->json(generateResponse("success", ["message" => "Deleted task", "payload" => $todoList]), 200);
         } else {
-            return response()->json($this->generateResponse("failed",["message" =>  "could not delete task"]), 402);
+            return response()->json(generateResponse("failed", ["message" => "could not delete task"]), 402);
         }
     }
     public function startTask(Request $request, TodoList $todoList)
