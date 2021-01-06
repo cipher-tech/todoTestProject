@@ -183,11 +183,11 @@ class TodoListController extends Controller
     public function searchTodoList(Request $request, User $user)
     {
         # code...
-        $match = $request->get ( 'match' );
-        $suggestion = $user->TodoList->where('name','LIKE','%'.$match.'%')->orWhere('email','LIKE','%'.$match.'%')->get();
+        $match = $request->get( 'match' );
+        $suggestion = $user->TodoList()->where('title','LIKE','%'.$match.'%')->orWhere('label','LIKE','%'.$match.'%')->get();
         // $user = User::where('name','LIKE','%'.$match.'%')->orWhere('email','LIKE','%'.$match.'%')->get();
         if(count($suggestion) > 0)
-            return view('welcome')->withDetails($user)->withQuery ( $match );
-        else return view ('welcome')->withMessage('No Details found. Try to search again !');
+            return response()->json($this->generateResponse("success", ["message" => "suggestions", "payload" => $suggestion]), 200);
+        else return response()->json($this->generateResponse("failed", ["message" => "suggestions", "payload" => []]), 200);
     }
 }
