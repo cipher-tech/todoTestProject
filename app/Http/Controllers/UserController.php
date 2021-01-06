@@ -53,7 +53,7 @@ class UserController extends Controller
             $token = self::getToken($request->email, $request->password);
             $user->auth_token = $token;
             $user->save();
-            $response = ['status' => true, 'data' => ["user" => $user]];
+            $response = ['status' => true, 'data' => ["Logged in user" => $user]];
         } else
             $response = ['status' => false, 'data' => "Record doesn't exists"];
 
@@ -80,7 +80,7 @@ class UserController extends Controller
             'name' => $request->name,
             'password' => \Hash::make($request->password),
             'email' => $request->email,
-            'slug' => $userSlug,
+            'slug' => \Str::slug($request->name),
             'phone_number' => $request->phone_number,
             'auth_token' => '',
         ];

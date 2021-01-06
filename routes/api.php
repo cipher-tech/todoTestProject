@@ -21,24 +21,21 @@ function generateResponse($status, $data)
 Route::post('login', 'App\Http\Controllers\UserController@login');
 Route::post('register', 'App\Http\Controllers\UserController@register');
 
-Route::get('test', function(){
-    return "test";
-});
-
 Route::group(['middleware' => 'jwt-auth'], function () {
     /* protected routes */
     Route::get('logout', 'App\Http\Controllers\UserController@logout');
 
     /* todo list routes */
-    Route::get('todo-list', 'App\Http\Controllers\TodoListController@index');
-    Route::get('todo-list/{todoList}', 'App\Http\Controllers\TodoListController@getTask');
-    Route::post('todo-list', 'App\Http\Controllers\TodoListController@create');
+    Route::get('todo-list/{user}', 'App\Http\Controllers\TodoListController@index');
+    Route::get('get-task/{todoList}', 'App\Http\Controllers\TodoListController@getTask');
+    Route::post('create-todo-list/{user}', 'App\Http\Controllers\TodoListController@create');
     Route::put('todo-list/{todoList}', 'App\Http\Controllers\TodoListController@update');
-    Route::delete('todo-list/{todoList}',"App\Http\Controllers\UserController@destroy" );
+    Route::delete('todo-list/{todoList}',"App\Http\Controllers\TodoListController@destroy" );
     Route::get('todo-list/start/{todoList}', 'App\Http\Controllers\TodoListController@startTask');
     Route::get('todo-list/completed/{todoList}', 'App\Http\Controllers\TodoListController@completedTask');
-    Route::get('todo-list-getByLabel/{user}', 'App\Http\Controllers\TodoListController@getTaskByLabel');
-    Route::get('todo-list-getByStatus/{user}', 'App\Http\Controllers\TodoListController@getTaskByStatus');
+    Route::post('todo-list-getByLabel/{user}', 'App\Http\Controllers\TodoListController@getTaskByLabel');
+    Route::post('todo-list-getByStatus/{user}', 'App\Http\Controllers\TodoListController@getTaskByStatus');
+    Route::post('todo-list-search/{user}', 'App\Http\Controllers\TodoListController@searchTodoList');
     
     /* user routes */
     Route::get('user-info/{user}', 'App\Http\Controllers\UserController@getUser');

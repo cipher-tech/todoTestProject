@@ -19,25 +19,25 @@ class TodoListController extends Controller
         return  ["status" => $status, "data" => $data];
     }
 
-    public function index(Request $request)
+    public function index(Request $request, User $user)
     {
         # code...
         $validator = Validator::make($request->all(), [
             'per_page' => 'required|min:1|max:10',
         ]);
         
-            return TodoList::paginate($request->per_page);
+        $taskByLabel = $user->TodoList()->paginate($request->per_page);
+            return response()->json($taskByLabel, 200) ;
     }
     public function getTask(Request $request, TodoList $todoList)
     {
         # code...
         return response()->json($this->generateResponse("success",["message" => "Task retrieved successfully", "payload" => $todoList ]), 200);
     }
-    public function create(Request $request)
+    public function create(Request $request, User $user)
     {
         # code...
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required|min:1|max:10',
             'title' => 'required|max:125',
             'description' => 'required|max:40',
             'label' => 'min:3|max:40',
@@ -62,11 +62,10 @@ class TodoListController extends Controller
             'reminder' => $request->reminder || false,
         ]);
 
-        $todoList->user()->associate($request->user_id);
+        $todoList->user()->associate($user->id);
        
         if ( $todoList->save()) {
-            $recentTodos = TodoList::orderBy('created_at', 'desc')->take(10)->get();
-            return response()->json($this->generateResponse("success",["Task created", $recentTodos ]), 200);
+            return response()->json($this->generateResponse("success",["Task created", $todoList ]), 200);
          } else {
             return response()->json($this->generateResponse("failed","could not create task"), 402);
          }
@@ -76,11 +75,13 @@ class TodoListController extends Controller
     {
         # code...
         $validator = Validator::make($request->all(), [
-            // 'id' => 'required|min:1|max:10',
             'title' => 'required|max:125',
             'description' => 'required|max:40',
             'label' => 'min:3|max:40',
             'priority' => 'min:4|max:40',
+            "estimated_start_date" => 'min:3|max:30',
+            "estimated_end_date" => 'min:3|max:30',
+            "comment" => 'min:3|max:30'
             
         ]);
 
@@ -90,7 +91,6 @@ class TodoListController extends Controller
             return response()->json($response, 403);
         }
 
-        // $todoList = TodoList::whereId($request->id)->firstOrFail();
 
             $todoList->title = $request->title;
             $todoList->description = $request->description;
@@ -104,7 +104,6 @@ class TodoListController extends Controller
             $todoList->comment = $request->comment ? $request->comment :  $todoList->comment;
 
         if ( $todoList->save()) {
-            // $recentTodos = TodoList::orderBy('created_at', 'desc')->take(10)->get();
             return response()->json($this->generateResponse("success",["message" => "Task updated","payload" =>  $todoList ]), 200);
         } else {
             return response()->json($this->generateResponse("failed",["message" => "could not update task"]), 402);
@@ -114,8 +113,7 @@ class TodoListController extends Controller
     public function destroy(Request $request, TodoList $todoList)
     {
         if ($todoList->delete()) {
-            $todoList = App\Models\TodoList::orderBy('created_at', 'desc')->take(10)->get();
-            return response()->json(generateResponse("success", ["message" => "Deleted task", "payload" => $todoList]), 200);
+            return response()->json(generateResponse("success", ["message" => "Deleted task"]), 200);
         } else {
             return response()->json(generateResponse("failed", ["message" => "could not delete task"]), 402);
         }
@@ -148,7 +146,7 @@ class TodoListController extends Controller
     public function getTaskByLabel(Request $request, User $user)
     {
         $validator = Validator::make($request->all(), [
-            'label' => 'required|min:3|max:40',
+            'label' => 'required|max:40',
         ]);
         if ($validator->fails()) {
             $response = ['status' => false, 'data' => ["message" => 'invalid input', "payload" => $validator->errors()]];
@@ -167,7 +165,7 @@ class TodoListController extends Controller
     public function getTaskByStatus(Request $request, User $user)
     {
         $validator = Validator::make($request->all(), [
-            'status' => 'required|min:3|max:40',
+            'status' => 'required|max:40',
         ]);
         if ($validator->fails()) {
             $response = ['status' => false, 'data' => ["message" => 'invalid input', "payload" => $validator->errors()]];
@@ -179,8 +177,17 @@ class TodoListController extends Controller
             global $request;
             return $todoList->status === $request->status;
            });
-        //    where('status', $request->status)->get();
         
         return response()->json($this->generateResponse("success", ["message" => "Task by status", "payload" => $taskByStatus]), 200);
+    }
+    public function searchTodoList(Request $request, User $user)
+    {
+        # code...
+        $match = $request->get ( 'match' );
+        $suggestion = $user->TodoList->where('name','LIKE','%'.$match.'%')->orWhere('email','LIKE','%'.$match.'%')->get();
+        // $user = User::where('name','LIKE','%'.$match.'%')->orWhere('email','LIKE','%'.$match.'%')->get();
+        if(count($suggestion) > 0)
+            return view('welcome')->withDetails($user)->withQuery ( $match );
+        else return view ('welcome')->withMessage('No Details found. Try to search again !');
     }
 }
