@@ -23,7 +23,7 @@ tasks in the todo list, it utilizes laravel's route model binding for it's API r
 
 it is accessible, powerful, and provides support larger scaling and implementing a more robust applications.
 
-## Learning Laravel
+## API Route Info
 The application is easy to use and implement, its routes are well documented and they include:
 - **POST register**
 - **POST  login**
