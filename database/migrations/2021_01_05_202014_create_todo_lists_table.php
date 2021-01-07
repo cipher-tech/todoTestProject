@@ -18,7 +18,7 @@ class CreateTodoListsTable extends Migration
             $table->string('title');
             $table->string('description');
             $table->integer('user_id');
-            $table->string('label')->nullable()->default(null);
+            $table->string('label')->nullable();
             $table->string('slug')->nullable();
             $table->string('comment')->nullable();
             $table->enum("status", ["completed", "ongoing", "not started"])->default("not started");

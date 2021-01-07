@@ -7,56 +7,46 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+## About Chibuikem's todo List
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+This is an advanced API based todo list built with the laravel framework. it enables users to schedule and manage 
+tasks in the todo list, it utilizes laravel's route model binding for it's API routes.
+ it's features includes:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- [Simple, fast routing engine based on laravel route model binding]<!-- (https://laravel.com/docs/routing). -->
+- [Authentication]<!-- (https://laravel.com/docs/container). -->
+- session management<!-- (https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage. -->
+- database support (SQL)<!-- (https://laravel.com/docs/eloquent). -->
+- API documentation<!-- (https://laravel.com/docs/migrations). -->
+- Search functionality<!-- (https://laravel.com/docs/migrations). -->
+- Usage statistics
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+it is accessible, powerful, and provides support larger scaling and implementing a more robust applications.
 
 ## Learning Laravel
+The application is easy to use and implement, its routes are well documented and they include:
+- **POST register**
+- **POST  login**
+- **POST  Get tasks**
+- **POST  create-todo-list**
+- **PUT  get-task**
+- **PUT  update task**
+- **DEL  delete task**
+- **GET  start task**
+- **GET  completed task**
+- **POST get task by label**
+- **POST get task by status**
+- **GET  get user info**
+- **GET  get user statistics**
+- **POST search for tasks**
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## how to install
+**1. Clone GitHub repo for this project locally**
+**2. cd into your project**
+**3. Install Composer Dependencies: using the "composer install" command**
+**4. Create a copy of your .env file**
+**5. Generate an app encryption key: using "php artisan key:generate" command**
+**6. Create an empty database for our application**
+**7. In the .env file, add database information to allow Laravel to connect to the database**
+**8. Migrate the database: using "php artisan migrate" command**
+**9. [Optional]: Seed the database: using "php artisan db:seed" command**
