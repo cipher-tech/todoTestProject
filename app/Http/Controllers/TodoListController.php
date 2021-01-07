@@ -63,7 +63,7 @@ class TodoListController extends Controller
             'slug' => \Str::slug($request->title),
             'priority' => $request->priority || $this->priority[0],
             'status' => $this->todoStatus[2],
-            'label' => $request->label || null,
+            'label' => $request->label ? $request->label :  null,
             'estimated_start_date' => $request->estimated_start_date ? $request->estimated_start_date :  null,
             'estimated_end_date' =>  $request->estimated_end_date ? $request->estimated_end_date :  null,
             'reminder' => $request->reminder || false,
