@@ -152,6 +152,7 @@ class UserController extends Controller
             $totalMinute = $started_at->diffInMinutes($completed_at);
             $totalSeconds = $started_at->diffInSeconds($completed_at);
 
+            /* building the time stats object */
             $stats = [
                 "id" => $todoList->id,
                 "title" => $todoList->title,
@@ -165,6 +166,7 @@ class UserController extends Controller
             $todoList->timeStats = $stats;
         })->pluck("timeStats");
 
+        /* returning response */
         return response()->json($this->generateResponse("success", [
             "message" => "Successfully fetched user",
             "payload" => [
