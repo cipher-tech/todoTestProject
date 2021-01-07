@@ -17,14 +17,12 @@ function generateResponse($status, $data)
 {
     return  ["status" => $status, "data" => $data];
 }
-
+ /* todo list Authentication routes */
 Route::post('login', 'App\Http\Controllers\UserController@login');
 Route::post('register', 'App\Http\Controllers\UserController@register');
 
 Route::group(['middleware' => 'jwt-auth'], function () {
     /* protected routes */
-    Route::get('logout', 'App\Http\Controllers\UserController@logout');
-
     /* todo list routes */
     Route::get('todo-list/{user}', 'App\Http\Controllers\TodoListController@index');
     Route::get('get-task/{todoList}', 'App\Http\Controllers\TodoListController@getTask');

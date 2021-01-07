@@ -14,12 +14,13 @@ class UserController extends Controller
     private function generateResponse($status, $data)
     {
         return  ["status" => $status, "data" => $data];
-    } 
+    }
     private function getToken($email, $password)
     {
+        /* getting JWT token */
         $token = null;
-        //$credentials = $request->only('email', 'password');
         try {
+            /* generate token */
             if (!$token = JWTAuth::attempt(['email' => $email, 'password' => $password])) {
                 return response()->json([
                     'response' => 'error',
@@ -28,6 +29,7 @@ class UserController extends Controller
                 ]);
             }
         } catch (JWTAuthException $e) {
+            /* if token generation fails */
             return response()->json([
                 'response' => 'error',
                 'message' => 'Token creation failed',
@@ -38,21 +40,26 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
+        /* validating client input */
         $validator = Validator::make($request->all(), [
             'email' => 'required|max:125|email',
             'password' => 'required|max:125'
         ]);
         if ($validator->fails()) {
+            /* checking if validation fails*/
             $response = ['status' => false, 'data' => 'invalid input'];
-
             return response()->json($response, 201);
         }
+
+        /* fetch user */
         $user = \App\Models\User::where('email', $request->email)->get()->last();
         if ($user && \Hash::check($request->password, $user->password)) // The passwords match...
         {
+            /* generate user JWT token */
             $token = self::getToken($request->email, $request->password);
             $user->auth_token = $token;
             $user->save();
+
             $response = ['status' => true, 'data' => ["Logged in user" => $user]];
         } else
             $response = ['status' => false, 'data' => "Record doesn't exists"];
@@ -63,19 +70,23 @@ class UserController extends Controller
 
     public function register(Request $request)
     {
+        // validating client input
         $validator = Validator::make($request->all(), [
             'name' => 'required|min:3|max:40|alpha',
             'email' => 'required|max:125|email',
             'password' => 'required|min:6|max:40',
             'phone_number' => 'required|min:4|max:40',
-            
+
         ]);
+
         if ($validator->fails()) {
+            /* checking if validation fails*/
             $response = ['status' => false, 'data' => ['invalid input', $validator->errors()]];
 
             return response()->json($response, 403);
         }
-        $userSlug = \uniqid();
+
+        /* defining new user */
         $payload = [
             'name' => $request->name,
             'password' => \Hash::make($request->password),
@@ -85,6 +96,7 @@ class UserController extends Controller
             'auth_token' => '',
         ];
 
+        /* creating new user */
         $user = new User($payload);
         if ($user->save()) {
 
@@ -98,7 +110,7 @@ class UserController extends Controller
 
             $user->save();
 
-            
+
 
             $response = ['status' => true, 'data' => ['name' => $user->name, 'id' => $user->id, 'email' => $request->email, 'auth_token' => $token]];
         } else
@@ -110,33 +122,36 @@ class UserController extends Controller
 
     public function getUser(Request $request, User $user)
     {
+        // fetch single user
         # code...
         return response()->json($this->generateResponse("success", ["message" => "Successfully fetched user", "payload" => $user]), 200);
-        
     }
     public function getUserStats(Request $request, User $user)
     {
+        // generate user statistics
         # code...
+
+        // get total tasks 
         $totalTasks = $user->TodoList()->count();
+        
+        // / get total label
         $totalLabels = $user->TodoList->filter(function ($todoList) {
             return $todoList->label !== '0';
-           })
-           ->count();
+        })
+        ->count();
 
-        //    $timeStats = [];
-           $timeStats = $user->TodoList->filter(function ($todoList) {
+        // / statistics for time and label
+        $timeStats = $user->TodoList->filter(function ($todoList) {
             return $todoList->status === 'completed';
-           })->each(function ($todoList) {
-            // global $timeStats;
-            // $timeStats = [];
+        })->each(function ($todoList) {
             $started_at = new Carbon($todoList->started_at, "West Central Africa");
             $completed_at = new Carbon($todoList->completed_at, "West Central Africa");
-            
+
             $totalDays = $started_at->diffInDays($completed_at);
             $totalHours = $started_at->diffInHours($completed_at);
             $totalMinute = $started_at->diffInMinutes($completed_at);
             $totalSeconds = $started_at->diffInSeconds($completed_at);
-            
+
             $stats = [
                 "id" => $todoList->id,
                 "title" => $todoList->title,
@@ -148,17 +163,15 @@ class UserController extends Controller
                 "totalSeconds" => $totalSeconds,
             ];
             $todoList->timeStats = $stats;
-       
-           })->pluck("timeStats");
+        })->pluck("timeStats");
 
         return response()->json($this->generateResponse("success", [
-            "message" => "Successfully fetched user", 
+            "message" => "Successfully fetched user",
             "payload" => [
                 "totalTasks" => $totalTasks,
                 "totalLabels" => $totalLabels,
                 "timeStats" => $timeStats
             ]
-            ]), 200);
-        
+        ]), 200);
     }
 }

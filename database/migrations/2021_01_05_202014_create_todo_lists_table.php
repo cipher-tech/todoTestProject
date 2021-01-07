@@ -13,6 +13,9 @@ class CreateTodoListsTable extends Migration
      */
     public function up()
     {
+ 
+           /* todo list migration schema */
+
         Schema::create('todo_lists', function (Blueprint $table) {
             $table->id();
             $table->string('title');
