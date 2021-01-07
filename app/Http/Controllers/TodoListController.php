@@ -28,7 +28,11 @@ class TodoListController extends Controller
         $validator = Validator::make($request->all(), [
             'per_page' => 'required|min:1|max:10',
         ]);
-
+        if ($validator->fails()) {
+            /* checking if validation fails*/
+            $response = ['status' => false, 'data' => ["message" => 'invalid input', "payload" => $validator->errors()]];
+            return response()->json($response, 403);
+        }
         /* fetching and returning data*/
         $taskByLabel = $user->TodoList()->paginate($request->per_page);
         return response()->json($taskByLabel, 200);
